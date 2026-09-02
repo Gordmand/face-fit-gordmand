@@ -18,6 +18,7 @@ export default defineConfig({
         landmarkerTest: "src/test/landmarker.html",
         swapTest: "src/test/swap.html",
         offscreenTest: "src/test/offscreen-test.html",
+        badgeTest: "src/test/badge-test.html",
       },
     },
   },

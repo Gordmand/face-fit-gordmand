@@ -3,6 +3,7 @@
 // Тяжёлого тут нет — только DOM и chrome.runtime.
 
 import { isImageCandidate, SerialQueue, upgradeLmcdnUrl } from "./src/content/scanner.js";
+import { initBadge, hideBadge } from "./src/content/badge.js";
 
 const MARK = "facefitDone"; // img.dataset.facefitDone === "1" — уже подменено
 const queue = new SerialQueue();
@@ -15,6 +16,7 @@ let started = false;
 let io = null;
 let mo = null;
 let noPhotoLogged = false;
+let inFlight = 0; // сколько картинок сейчас в очереди/обработке — для индикатора в popup
 
 async function main() {
   ({ enabled, foreheadMask } = await chrome.storage.local.get({
@@ -43,6 +45,7 @@ function start() {
   started = true;
   console.info("[face-fit] сканер запущен на", location.host);
 
+  initBadge(toggleImage);
   io = new IntersectionObserver(onIntersect, { rootMargin: "200px" });
   mo = new MutationObserver(onMutations);
   mo.observe(document.documentElement, {
@@ -60,16 +63,19 @@ function stop() {
   io?.disconnect();
   mo?.disconnect();
   io = mo = null;
+  hideBadge();
   for (const img of document.querySelectorAll(`img[data-facefit-done]`)) revert(img);
   cache.clear();
 }
 
 /** Сброс всех замен и повторная обработка — при смене настройки «маска в лоб». */
 function reprocessAll() {
+  hideBadge();
   cache.clear();
   for (const img of document.querySelectorAll(`img[data-facefit-done]`)) {
     delete img.dataset[MARK];
     delete img.dataset.facefitKey;
+    delete img.dataset.facefitShown;
     seen.delete(img);
     io?.observe(img); // старый своп остаётся виден, пока не придёт новый
   }
@@ -109,7 +115,8 @@ function consider(img) {
   }
 
   seen.add(img);
-  queue.push(() => process(img, src));
+  inFlight++;
+  queue.push(() => process(img, src).finally(() => { inFlight--; }));
 }
 
 // --- обработка ---
@@ -175,7 +182,36 @@ function revert(img) {
   delete img.dataset.facefitOrig;
   delete img.dataset.facefitSrcset;
   delete img.dataset.facefitKey;
+  delete img.dataset.facefitShown;
   seen.delete(img);
+}
+
+// --- переключение одной картинки (бейдж) ---
+
+/** @returns {"orig" | "swap"} новое состояние показа */
+function toggleImage(img) {
+  if (img.dataset.facefitShown === "orig") {
+    showSwap(img);
+    return "swap";
+  }
+  showOriginal(img);
+  return "orig";
+}
+
+function showOriginal(img) {
+  if (img.dataset.facefitOrig) img.src = img.dataset.facefitOrig;
+  const ss = img.dataset.facefitSrcset;
+  if (ss) img.setAttribute("srcset", ss);
+  else img.removeAttribute("srcset");
+  img.dataset.facefitShown = "orig";
+}
+
+function showSwap(img) {
+  const dataUrl = cache.get(img.dataset.facefitKey);
+  if (!dataUrl) return;
+  img.removeAttribute("srcset");
+  img.src = dataUrl;
+  delete img.dataset.facefitShown;
 }
 
 // --- мутации DOM ---
@@ -187,6 +223,7 @@ function onMutations(muts) {
       if (img.tagName !== "IMG") continue;
 
       if (img.dataset[MARK]) {
+        if (img.dataset.facefitShown === "orig") continue; // пользователь сам вернул оригинал
         // Наш своп — это data:. Если src снова http(s), значит SPA перерисовала карточку.
         if (!img.src.startsWith("data:")) {
           const cached = cache.get(img.dataset.facefitKey);
@@ -212,5 +249,16 @@ function onMutations(muts) {
     }
   }
 }
+
+// --- статистика для popup ---
+
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg?.type !== "facefit:get-stats") return;
+  sendResponse({
+    applied: document.querySelectorAll(`img[data-facefit-done]`).length,
+    pending: inFlight,
+    enabled,
+  });
+});
 
 main();

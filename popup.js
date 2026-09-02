@@ -176,9 +176,41 @@ el("open-offscreen-test").addEventListener("click", () => {
   chrome.tabs.create({ url: chrome.runtime.getURL("src/test/offscreen-test.html") });
 });
 
+// --- Статус активной вкладки (счётчик замен / индикатор обработки) ---
+
+const pageStatus = el("page-status");
+
+function setPageStatus(s) {
+  if (!s || !s.enabled) {
+    pageStatus.hidden = true;
+    return;
+  }
+  pageStatus.hidden = false;
+  if (s.pending > 0) {
+    pageStatus.innerHTML = `<span class="spinner"></span> Обрабатываю…`;
+  } else if (s.applied > 0) {
+    pageStatus.textContent = `Заменено лиц на странице: ${s.applied}`;
+  } else {
+    pageStatus.textContent = "Лиц для замены пока не найдено";
+  }
+}
+
+async function pollPageStatus() {
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab?.id) return setPageStatus(null);
+    setPageStatus(await chrome.tabs.sendMessage(tab.id, { type: "facefit:get-stats" }));
+  } catch {
+    setPageStatus(null); // на этой вкладке нет нашего content script
+  }
+}
+
 // --- Старт ---
 
 (async () => {
   await initToggles();
   await renderSaved();
+  pollPageStatus();
+  const timer = setInterval(pollPageStatus, 1000);
+  window.addEventListener("unload", () => clearInterval(timer));
 })();
