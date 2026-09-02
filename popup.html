@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Face Fit</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header>
+    <h1>Face Fit</h1>
+    <label class="switch" title="Включить примерку">
+      <input type="checkbox" id="enabled-toggle" />
+      <span class="slider"></span>
+    </label>
+  </header>
+
+  <main>
+    <section id="photo">
+      <!-- Нет фото -->
+      <div id="state-empty" class="state" hidden>
+        <p class="hint">
+          Загрузите своё фото анфас — по нему строится примерка.
+          Фото хранится только на этом устройстве и никуда не отправляется.
+        </p>
+        <label class="btn primary">
+          Выбрать фото
+          <input type="file" id="file" accept="image/*" hidden />
+        </label>
+      </div>
+
+      <!-- Обработка -->
+      <div id="state-busy" class="state" hidden>
+        <div class="spinner"></div>
+        <p class="hint" id="busy-text">Обработка…</p>
+      </div>
+
+      <!-- Фото сохранено -->
+      <div id="state-saved" class="state" hidden>
+        <img id="preview" alt="Ваше фото" />
+        <p class="meta" id="meta-text"></p>
+        <div class="row">
+          <label class="btn">
+            Заменить
+            <input type="file" id="file-replace" accept="image/*" hidden />
+          </label>
+          <button class="btn danger" id="remove" type="button">Удалить</button>
+        </div>
+      </div>
+
+      <p id="error" class="error" hidden></p>
+    </section>
+
+    <section id="settings">
+      <label class="setting-row">
+        <span>Маска в лоб</span>
+        <span class="switch">
+          <input type="checkbox" id="forehead-toggle" />
+          <span class="slider"></span>
+        </span>
+      </label>
+      <p class="hint">Поднимает край замены в линию волос — стык менее заметен.</p>
+    </section>
+
+    <button id="open-test" class="link-btn" type="button">🔬 Тест детекции лица</button>
+    <button id="open-swap-test" class="link-btn" type="button">🔬 Тест face swap</button>
+    <button id="open-offscreen-test" class="link-btn" type="button">🔬 Тест offscreen</button>
+  </main>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

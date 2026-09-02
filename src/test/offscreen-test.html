@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Face Fit — тест offscreen</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, "Segoe UI", sans-serif;
+      max-width: 900px;
+      margin: 24px auto;
+      padding: 0 16px;
+      color: #1a1a1a;
+      background: #fff;
+    }
+    h1 { font-size: 18px; }
+    .note { font-size: 13px; color: #666; background: #f4f4f5; border-radius: 6px; padding: 10px; }
+    label.file {
+      display: inline-block; font: inherit; margin-top: 12px;
+      padding: 8px 14px; border: 1px solid #ccc; border-radius: 6px; background: #f6f6f7; cursor: pointer;
+    }
+    input[type="file"] { display: none; }
+    .row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 14px; }
+    figure { margin: 0; }
+    figcaption { font-size: 12px; color: #666; margin-bottom: 4px; }
+    img { max-width: 320px; max-height: 420px; border: 1px solid #ddd; border-radius: 6px; background: #fafafa; display: block; }
+    pre { font-size: 12px; background: #f4f4f5; border-radius: 6px; padding: 10px; white-space: pre-wrap; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Тест offscreen — этап 5b</h1>
+  <p class="note">
+    Проверка полного пути: страница → service worker → offscreen-документ (MediaPipe + ONNX + WebGPU) → назад.
+    Лицо-источник берётся из сохранённого фото пользователя — <b>сначала загрузите своё фото в popup расширения</b>.
+  </p>
+
+  <label class="file">
+    Выбрать целевое фото
+    <input type="file" id="file" accept="image/*" />
+  </label>
+
+  <div class="row">
+    <figure><figcaption>Оригинал</figcaption><img id="orig" alt="" /></figure>
+    <figure><figcaption>Результат (из offscreen)</figcaption><img id="result" alt="" /></figure>
+  </div>
+
+  <pre id="log">Выберите целевое фото…</pre>
+
+  <script type="module" src="./offscreen-test.js"></script>
+</body>
+</html>

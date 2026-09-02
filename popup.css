@@ -1,0 +1,207 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+body {
+  width: 320px;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #1a1a1a;
+  background: #fff;
+  padding: 14px 16px;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+h1 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.hint {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.45;
+}
+
+.state {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+}
+
+#settings {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  cursor: pointer;
+  margin-bottom: 4px;
+}
+
+/* Кнопки */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: inherit;
+  font-size: 13px;
+  padding: 8px 12px;
+  border: 1px solid #d4d4d8;
+  border-radius: 6px;
+  background: #f6f6f7;
+  cursor: pointer;
+  text-align: center;
+}
+
+.btn:hover {
+  background: #ececed;
+}
+
+.btn.primary {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+}
+
+.btn.primary:hover {
+  background: #1d4ed8;
+}
+
+.btn.danger {
+  color: #b91c1c;
+  border-color: #e7c3c3;
+  background: #fdf3f3;
+}
+
+.btn.danger:hover {
+  background: #fbe8e8;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+}
+
+.row .btn {
+  flex: 1;
+}
+
+/* Превью фото */
+#preview {
+  width: 100%;
+  max-height: 240px;
+  object-fit: contain;
+  border: 1px solid #e4e4e7;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.meta {
+  font-size: 11px;
+  color: #888;
+  text-align: center;
+}
+
+/* Ошибка */
+.error {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #b91c1c;
+  background: #fdf3f3;
+  border: 1px solid #f0d4d4;
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+/* Спиннер */
+.spinner {
+  width: 22px;
+  height: 22px;
+  margin: 4px auto 0;
+  border: 3px solid #e4e4e7;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.link-btn {
+  margin-top: 14px;
+  width: 100%;
+  font: inherit;
+  font-size: 12px;
+  padding: 7px;
+  border: 1px solid #e4e4e7;
+  border-radius: 6px;
+  background: #fafafa;
+  color: #555;
+  cursor: pointer;
+}
+
+.link-btn:hover {
+  background: #f0f0f0;
+}
+
+/* Тумблер */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  background: #ccc;
+  border-radius: 22px;
+  transition: background 0.15s;
+}
+
+.slider::before {
+  content: "";
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  top: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.15s;
+}
+
+input:checked + .slider {
+  background: #2563eb;
+}
+
+input:checked + .slider::before {
+  transform: translateX(18px);
+}

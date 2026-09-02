@@ -1,0 +1,12 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.claude/settings.local.json
+
+# Генерируется `npm run setup` — не коммитим (см. scripts/prepare-assets.mjs)
+public/wasm/
+public/ort/
+public/models/

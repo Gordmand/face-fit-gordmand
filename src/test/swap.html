@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Face Fit — тест face swap</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, "Segoe UI", sans-serif;
+      max-width: 1000px;
+      margin: 24px auto;
+      padding: 0 16px;
+      color: #1a1a1a;
+      background: #fff;
+    }
+    h1 { font-size: 18px; }
+    h2 { font-size: 13px; margin: 18px 0 6px; color: #555; }
+    .files { display: flex; gap: 16px; flex-wrap: wrap; }
+    label.file {
+      display: inline-block;
+      font: inherit;
+      padding: 8px 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #f6f6f7;
+      cursor: pointer;
+    }
+    input[type="file"] { display: none; }
+    .opts { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 14px; font-size: 14px; }
+    .opt { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
+    .switch { position: relative; display: inline-block; width: 40px; height: 22px; flex: none; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; inset: 0; cursor: pointer;
+      background: #ccc; border-radius: 22px; transition: background 0.15s;
+    }
+    .slider::before {
+      content: ""; position: absolute; height: 16px; width: 16px; left: 3px; top: 3px;
+      background: #fff; border-radius: 50%; transition: transform 0.15s;
+    }
+    .switch input:checked + .slider { background: #2563eb; }
+    .switch input:checked + .slider::before { transform: translateX(18px); }
+    .canvases { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; margin-top: 14px; }
+    figure { margin: 0; }
+    figcaption { font-size: 12px; color: #666; margin-bottom: 4px; }
+    canvas { border: 1px solid #ddd; border-radius: 6px; background: #fafafa; }
+    canvas.crop { image-rendering: pixelated; width: 160px; height: 160px; }
+    pre {
+      font-size: 12px;
+      background: #f4f4f5;
+      border-radius: 6px;
+      padding: 10px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Тест face swap — этап 4e: вклейка обратно</h1>
+  <p>Источник — лицо, которое подставляем. Цель — фото, куда подставляем.
+     Тумблеры пересчитываются мгновенно (без повторного inswapper).</p>
+
+  <div class="files">
+    <label class="file">Источник (ваше лицо)<input type="file" id="src" accept="image/*" /></label>
+    <label class="file">Цель<input type="file" id="tgt" accept="image/*" /></label>
+  </div>
+
+  <div class="opts">
+    <label class="opt">
+      <span class="switch"><input type="checkbox" id="opt-forehead" checked /><span class="slider"></span></span>
+      маска в лоб
+    </label>
+    <label class="opt">
+      <span class="switch"><input type="checkbox" id="opt-skin" checked /><span class="slider"></span></span>
+      подгон цвета кожи
+    </label>
+  </div>
+
+  <div class="canvases">
+    <figure>
+      <figcaption>Ваше фото</figcaption>
+      <canvas id="srcThumb" width="220" height="220"></canvas>
+    </figure>
+    <figure>
+      <figcaption>Целевое фото</figcaption>
+      <canvas id="orig" width="220" height="220"></canvas>
+    </figure>
+    <figure>
+      <figcaption>Результат</figcaption>
+      <canvas id="result" width="220" height="220"></canvas>
+    </figure>
+    <figure>
+      <figcaption>Лицо, кроп 128</figcaption>
+      <canvas class="crop" id="resultCrop" width="128" height="128"></canvas>
+    </figure>
+  </div>
+
+  <h2>Лог</h2>
+  <pre id="log">Выберите источник и цель…</pre>
+
+  <script type="module" src="./swap.js"></script>
+</body>
+</html>

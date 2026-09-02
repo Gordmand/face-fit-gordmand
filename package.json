@@ -1,0 +1,24 @@
+{
+  "name": "face-fit-extension",
+  "version": "0.1.0",
+  "description": "Локальная виртуальная примерка одежды: подставляет лицо пользователя моделям на карточках товаров. Обработка целиком в браузере.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "setup": "node scripts/prepare-assets.mjs",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.7.1",
+    "vite": "^8.2.2",
+    "vitest": "^3.2.7"
+  },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "^1.0.1",
+    "onnxruntime-web": "^1.29.0"
+  }
+}

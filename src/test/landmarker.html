@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Face Fit — тест детекции лица</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, "Segoe UI", sans-serif;
+      max-width: 900px;
+      margin: 24px auto;
+      padding: 0 16px;
+      color: #1a1a1a;
+      background: #fff;
+    }
+    h1 { font-size: 18px; }
+    .controls { display: flex; gap: 12px; align-items: center; margin: 16px 0; flex-wrap: wrap; }
+    button, label.file {
+      font: inherit;
+      padding: 8px 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #f6f6f7;
+      cursor: pointer;
+    }
+    button:disabled { opacity: 0.5; cursor: default; }
+    input[type="file"] { display: none; }
+    #status {
+      font-family: ui-monospace, "Cascadia Code", monospace;
+      font-size: 13px;
+      white-space: pre-wrap;
+      background: #f4f4f5;
+      border-radius: 6px;
+      padding: 10px;
+      min-height: 3em;
+    }
+    #stage { position: relative; margin-top: 16px; }
+    canvas { max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 6px; display: block; }
+    label.opt { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <h1>Тест детекции лица (MediaPipe Face Landmarker)</h1>
+  <p>Этап 2. Выберите изображение с лицом — на canvas отрисуются сетка из 468 точек, рамка и 5 опорных точек.</p>
+
+  <div class="controls">
+    <label class="file">
+      Выбрать изображение
+      <input type="file" id="file" accept="image/*" />
+    </label>
+    <label class="opt"><input type="checkbox" id="mesh" checked /> сетка 468</label>
+    <label class="opt"><input type="checkbox" id="box" checked /> рамка</label>
+    <label class="opt"><input type="checkbox" id="five" checked /> 5 опорных</label>
+  </div>
+
+  <div id="status">Инициализация…</div>
+  <div id="stage"><canvas id="canvas" width="640" height="480"></canvas></div>
+
+  <script type="module" src="./landmarker.js"></script>
+</body>
+</html>
