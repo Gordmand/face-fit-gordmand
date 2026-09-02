@@ -143,15 +143,13 @@ async function process(img, origUrl) {
       noPhotoLogged = true;
       console.info("[face-fit] загрузите своё фото в popup — замена не работает без него");
     } else if (res?.reason === "no-face") {
-      cache.set(key, null);
-      console.log(`[face-fit] ✗ лицо не найдено · ${key.slice(0, 100)}`);
+      cache.set(key, null); // лица нет — повторно не дёргаем
     }
     return;
   }
 
   cache.set(key, res.dataUrl);
   if (!enabled || !img.isConnected) return;
-  console.log(`[face-fit] ✓ заменено · лицо ${res.faceW}×${res.faceH}px в ${res.width}×${res.height}`);
   applyResult(img, origUrl, key, res.dataUrl);
 }
 
