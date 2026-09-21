@@ -222,10 +222,70 @@ async function extractEmap() {
   throw new Error('emap: инициализатор с именем "emap" не найден');
 }
 
+// --- Финальная проверка: всё ли реально на месте и разумного размера ---
+//
+// download() и раньше падал с ошибкой при неудачном скачивании — но если сеть
+// оборвалась и человек не заметил красную строку в потоке вывода (или запускал
+// setup несколько раз), файл мог остаться отсутствующим или обрезанным, а
+// npm run build молча собрал бы расширение без него. Проверяем явно, в конце,
+// одним понятным списком.
+const EXPECTED_FILES = [
+  { path: p("public/models/face_landmarker.task"), minBytes: 3_000_000, label: "face_landmarker.task" },
+  { path: p("public/models/w600k_r50.onnx"), minBytes: 150_000_000, label: "w600k_r50.onnx (ArcFace)" },
+  { path: p("public/models/inswapper_128_fp16.onnx"), minBytes: 250_000_000, label: "inswapper_128_fp16.onnx" },
+  { path: p("public/models/genderage.onnx"), minBytes: 1_000_000, label: "genderage.onnx" },
+  { path: p("public/models/inswapper_emap.bin"), minBytes: 1_000_000, label: "inswapper_emap.bin" },
+  { path: p("public/ort/ort-wasm-simd-threaded.asyncify.wasm"), minBytes: 20_000_000, label: "ort-wasm-simd-threaded.asyncify.wasm" },
+  { path: p("public/ort/ort-wasm-simd-threaded.asyncify.mjs"), minBytes: 20_000, label: "ort-wasm-simd-threaded.asyncify.mjs" },
+];
+
+async function verifyAssets() {
+  console.log("\nПроверка целостности файлов:");
+  let ok = true;
+
+  for (const { path, minBytes, label } of EXPECTED_FILES) {
+    if (!(await exists(path))) {
+      console.log(`✗ ${label} — файла нет`);
+      ok = false;
+      continue;
+    }
+    const { size } = await stat(path);
+    if (size < minBytes) {
+      console.log(
+        `✗ ${label} — подозрительно маленький файл (${mb(size)}, ожидалось от ${mb(minBytes)}) — похоже, скачивание оборвалось`,
+      );
+      ok = false;
+      continue;
+    }
+    console.log(`✓ ${label} (${mb(size)})`);
+  }
+
+  const wasmDir = p("public/wasm");
+  const wasmFiles = await readdir(wasmDir).catch(() => []);
+  const wasmSizes = await Promise.all(
+    wasmFiles.filter((f) => f.endsWith(".wasm")).map(async (f) => (await stat(resolve(wasmDir, f))).size),
+  );
+  if (!wasmSizes.some((s) => s > 5_000_000)) {
+    console.log("✗ public/wasm/ — не найден wasm MediaPipe подходящего размера");
+    ok = false;
+  } else {
+    console.log(`✓ public/wasm/ (${wasmFiles.length} файлов)`);
+  }
+
+  if (!ok) {
+    throw new Error(
+      "Не все файлы скачались полностью (см. ✗ выше) — обычно причина в обрыве сети. " +
+        "Удалите проблемный файл (например, всю папку public/models) и запустите npm run setup ещё раз.",
+    );
+  }
+  console.log("Все файлы на месте.\n");
+}
+
 await mediapipeWasm();
 await ortWasm();
 for (const m of Object.values(MODELS)) {
   await download(m.url, m.dest, m.label);
 }
 await extractEmap();
+await verifyAssets();
 console.log("Готово.");
