@@ -1,0 +1,49 @@
+{
+  "extName": { "message": "Face Fit — виртуальная примерка" },
+  "extDesc": { "message": "Локальная примерка одежды: подставляет ваше лицо моделям на карточках товаров. Вся обработка — в браузере." },
+  "toggleTitle": { "message": "Включить примерку" },
+  "noPhotoHint": { "message": "Загрузите своё фото анфас — по нему строится примерка. Фото хранится только на этом устройстве и никуда не отправляется." },
+  "chooseFile": { "message": "Выбрать фото" },
+  "busyDefault": { "message": "Обработка…" },
+  "busyLoadingModel": { "message": "Загружаю модель…" },
+  "busySearchingFace": { "message": "Ищу лицо…" },
+  "previewAlt": { "message": "Ваше фото" },
+  "replacePhoto": { "message": "Заменить" },
+  "removePhoto": { "message": "Удалить" },
+  "foreheadMaskLabel": { "message": "Маска в лоб" },
+  "foreheadMaskHint": { "message": "Поднимает край замены в линию волос — стык менее заметен." },
+  "matchGenderLabel": { "message": "Только модели своего пола" },
+  "matchGenderHint": { "message": "Выключите, чтобы примерять образы любого пола." },
+  "myGenderLabel": { "message": "Мой пол" },
+  "genderFemaleShort": { "message": "Ж" },
+  "genderMaleShort": { "message": "М" },
+  "errNoFace": { "message": "На фото не найдено лицо. Нужен чёткий портрет анфас." },
+  "errMultiFace": {
+    "message": "На фото несколько лиц ($COUNT$). Загрузите фото только со своим лицом.",
+    "placeholders": { "count": { "content": "$1" } }
+  },
+  "errFaceTooSmall": { "message": "Лицо на фото слишком мелкое. Нужен более крупный портрет." },
+  "errProcessFailed": {
+    "message": "Не удалось обработать фото: $MESSAGE$",
+    "placeholders": { "message": { "content": "$1" } }
+  },
+  "errNeedPhotoFirst": { "message": "Сначала загрузите своё фото." },
+  "photoMeta": {
+    "message": "$WIDTH$×$HEIGHT$ · сохранено $DATE$",
+    "placeholders": {
+      "width": { "content": "$1" },
+      "height": { "content": "$2" },
+      "date": { "content": "$3" }
+    }
+  },
+  "statusPipelineError": { "message": "Не удалось обработать страницу. Попробуйте её перезагрузить." },
+  "statusNoPhoto": { "message": "Загрузите своё фото — без него замена не работает." },
+  "statusProcessing": { "message": "Обрабатываю…" },
+  "statusApplied": {
+    "message": "Заменено лиц на странице: $COUNT$",
+    "placeholders": { "count": { "content": "$1" } }
+  },
+  "statusNoneFound": { "message": "Лиц для замены пока не найдено" },
+  "badgeShowOriginal": { "message": "оригинал" },
+  "badgeRestoreFace": { "message": "вернуть лицо" }
+}

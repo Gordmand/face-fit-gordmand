@@ -9,7 +9,7 @@
 <body>
   <header>
     <h1>Face Fit</h1>
-    <label class="switch" title="Включить примерку">
+    <label class="switch" data-i18n-title="toggleTitle" title="Включить примерку">
       <input type="checkbox" id="enabled-toggle" />
       <span class="slider"></span>
     </label>
@@ -21,12 +21,12 @@
     <section id="photo">
       <!-- Нет фото -->
       <div id="state-empty" class="state" hidden>
-        <p class="hint">
+        <p class="hint" data-i18n="noPhotoHint">
           Загрузите своё фото анфас — по нему строится примерка.
           Фото хранится только на этом устройстве и никуда не отправляется.
         </p>
         <label class="btn primary">
-          Выбрать фото
+          <span data-i18n="chooseFile">Выбрать фото</span>
           <input type="file" id="file" accept="image/*" hidden />
         </label>
       </div>
@@ -34,19 +34,19 @@
       <!-- Обработка -->
       <div id="state-busy" class="state" hidden>
         <div class="spinner"></div>
-        <p class="hint" id="busy-text">Обработка…</p>
+        <p class="hint" id="busy-text" data-i18n="busyDefault">Обработка…</p>
       </div>
 
       <!-- Фото сохранено -->
       <div id="state-saved" class="state" hidden>
-        <img id="preview" alt="Ваше фото" />
+        <img id="preview" data-i18n-alt="previewAlt" alt="Ваше фото" />
         <p class="meta" id="meta-text"></p>
         <div class="row">
           <label class="btn">
-            Заменить
+            <span data-i18n="replacePhoto">Заменить</span>
             <input type="file" id="file-replace" accept="image/*" hidden />
           </label>
-          <button class="btn danger" id="remove" type="button">Удалить</button>
+          <button class="btn danger" id="remove" type="button" data-i18n="removePhoto">Удалить</button>
         </div>
       </div>
 
@@ -55,29 +55,29 @@
 
     <section id="settings">
       <label class="setting-row">
-        <span>Маска в лоб</span>
+        <span data-i18n="foreheadMaskLabel">Маска в лоб</span>
         <span class="switch">
           <input type="checkbox" id="forehead-toggle" />
           <span class="slider"></span>
         </span>
       </label>
-      <p class="hint">Поднимает край замены в линию волос — стык менее заметен.</p>
+      <p class="hint" data-i18n="foreheadMaskHint">Поднимает край замены в линию волос — стык менее заметен.</p>
 
       <label class="setting-row">
-        <span>Только модели своего пола</span>
+        <span data-i18n="matchGenderLabel">Только модели своего пола</span>
         <span class="switch">
           <input type="checkbox" id="match-gender-toggle" />
           <span class="slider"></span>
         </span>
       </label>
       <div class="setting-row">
-        <span>Мой пол</span>
+        <span data-i18n="myGenderLabel">Мой пол</span>
         <span class="segmented" id="gender-segmented">
-          <button type="button" class="segmented-btn" data-gender="female">Ж</button>
-          <button type="button" class="segmented-btn" data-gender="male">М</button>
+          <button type="button" class="segmented-btn" data-gender="female" data-i18n="genderFemaleShort">Ж</button>
+          <button type="button" class="segmented-btn" data-gender="male" data-i18n="genderMaleShort">М</button>
         </span>
       </div>
-      <p class="hint">Выключите, чтобы примерять образы любого пола.</p>
+      <p class="hint" data-i18n="matchGenderHint">Выключите, чтобы примерять образы любого пола.</p>
     </section>
 
     <button id="open-test" class="link-btn" type="button">🔬 Тест детекции лица</button>

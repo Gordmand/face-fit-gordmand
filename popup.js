@@ -9,10 +9,24 @@ import {
 } from "./src/lib/storage.js";
 
 const el = (id) => document.getElementById(id);
+const t = (key, subs) => chrome.i18n.getMessage(key, subs);
 
 /** Сообщить offscreen-документу, что фото сменилось (сбросить кэш эмбеддинга). */
 function notifyPhotoChanged() {
   chrome.runtime.sendMessage({ type: "facefit:photo-changed" }).catch(() => {});
+}
+
+/** Подставить переводы в статичную разметку popup.html. */
+function applyI18n() {
+  document.querySelectorAll("[data-i18n]").forEach((elem) => {
+    elem.textContent = t(elem.dataset.i18n);
+  });
+  document.querySelectorAll("[data-i18n-title]").forEach((elem) => {
+    elem.title = t(elem.dataset.i18nTitle);
+  });
+  document.querySelectorAll("[data-i18n-alt]").forEach((elem) => {
+    elem.alt = t(elem.dataset.i18nAlt);
+  });
 }
 
 const toggle = el("enabled-toggle");
@@ -54,21 +68,21 @@ async function handleFile(file) {
   showState("busy");
 
   try {
-    busyText.textContent = "Загружаю модель…";
+    busyText.textContent = t("busyLoadingModel");
     const landmarker = await ensureLandmarker();
 
-    busyText.textContent = "Ищу лицо…";
+    busyText.textContent = t("busySearchingFace");
     const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
     const result = landmarker.detect(bitmap);
     const faces = result.faceLandmarks ?? [];
 
     if (faces.length === 0) {
-      finishWithError("На фото не найдено лицо. Нужен чёткий портрет анфас.");
+      finishWithError(t("errNoFace"));
       bitmap.close?.();
       return;
     }
     if (faces.length > 1) {
-      finishWithError(`На фото несколько лиц (${faces.length}). Загрузите фото только со своим лицом.`);
+      finishWithError(t("errMultiFace", String(faces.length)));
       bitmap.close?.();
       return;
     }
@@ -76,7 +90,7 @@ async function handleFile(file) {
     const lm = faces[0];
     const box = landmarksBBox(lm);
     if (Math.min(box.w, box.h) < MIN_FACE_FRACTION) {
-      finishWithError("Лицо на фото слишком мелкое. Нужен более крупный портрет.");
+      finishWithError(t("errFaceTooSmall"));
       bitmap.close?.();
       return;
     }
@@ -94,7 +108,7 @@ async function handleFile(file) {
     await renderSaved();
   } catch (err) {
     console.error("[face-fit] обработка фото:", err);
-    finishWithError(`Не удалось обработать фото: ${err.message}`);
+    finishWithError(t("errProcessFailed", err.message));
   }
 }
 
@@ -116,8 +130,8 @@ async function renderSaved() {
   previewUrl = URL.createObjectURL(blob);
   preview.src = previewUrl;
 
-  const when = new Date(meta.savedAt).toLocaleDateString("ru-RU");
-  metaText.textContent = `${meta.width}×${meta.height} · сохранено ${when}`;
+  const when = new Date(meta.savedAt).toLocaleDateString(chrome.i18n.getUILanguage());
+  metaText.textContent = t("photoMeta", [String(meta.width), String(meta.height), when]);
   showState("saved");
 }
 
@@ -149,7 +163,7 @@ async function initToggles() {
 toggle.addEventListener("change", async () => {
   if (toggle.checked && !hasPhoto) {
     toggle.checked = false;
-    showError("Сначала загрузите своё фото.");
+    showError(t("errNeedPhotoFirst"));
     return;
   }
   showError("");
@@ -212,15 +226,15 @@ function setPageStatus(s) {
   pageStatus.hidden = false;
   pageStatus.classList.toggle("warn", !!s.pipelineError);
   if (s.pipelineError) {
-    pageStatus.textContent = "Не удалось обработать страницу. Попробуйте её перезагрузить.";
+    pageStatus.textContent = t("statusPipelineError");
   } else if (s.noPhoto) {
-    pageStatus.textContent = "Загрузите своё фото — без него замена не работает.";
+    pageStatus.textContent = t("statusNoPhoto");
   } else if (s.pending > 0) {
-    pageStatus.innerHTML = `<span class="spinner"></span> Обрабатываю…`;
+    pageStatus.innerHTML = `<span class="spinner"></span> ${t("statusProcessing")}`;
   } else if (s.applied > 0) {
-    pageStatus.textContent = `Заменено лиц на странице: ${s.applied}`;
+    pageStatus.textContent = t("statusApplied", String(s.applied));
   } else {
-    pageStatus.textContent = "Лиц для замены пока не найдено";
+    pageStatus.textContent = t("statusNoneFound");
   }
 }
 
@@ -237,6 +251,7 @@ async function pollPageStatus() {
 // --- Старт ---
 
 (async () => {
+  applyI18n();
   await initToggles();
   await renderSaved();
   pollPageStatus();

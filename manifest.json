@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "Face Fit — виртуальная примерка",
+  "default_locale": "ru",
+  "name": "__MSG_extName__",
   "version": "0.1.0",
-  "description": "Локальная примерка одежды: подставляет ваше лицо моделям на карточках товаров. Вся обработка — в браузере.",
+  "description": "__MSG_extDesc__",
   "action": {
     "default_popup": "popup.html",
     "default_title": "Face Fit"

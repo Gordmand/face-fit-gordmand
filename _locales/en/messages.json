@@ -1,0 +1,49 @@
+{
+  "extName": { "message": "Face Fit — Virtual Try-On" },
+  "extDesc": { "message": "Local outfit try-on: swaps your face onto models in product photos. All processing happens in your browser." },
+  "toggleTitle": { "message": "Enable try-on" },
+  "noPhotoHint": { "message": "Upload a front-facing photo of yourself — it's used to build the try-on. The photo stays on this device and is never sent anywhere." },
+  "chooseFile": { "message": "Choose photo" },
+  "busyDefault": { "message": "Processing…" },
+  "busyLoadingModel": { "message": "Loading model…" },
+  "busySearchingFace": { "message": "Looking for a face…" },
+  "previewAlt": { "message": "Your photo" },
+  "replacePhoto": { "message": "Replace" },
+  "removePhoto": { "message": "Remove" },
+  "foreheadMaskLabel": { "message": "Forehead mask" },
+  "foreheadMaskHint": { "message": "Raises the swap edge into the hairline — the seam is less visible." },
+  "matchGenderLabel": { "message": "Only match my gender" },
+  "matchGenderHint": { "message": "Turn off to try on looks for any gender." },
+  "myGenderLabel": { "message": "My gender" },
+  "genderFemaleShort": { "message": "F" },
+  "genderMaleShort": { "message": "M" },
+  "errNoFace": { "message": "No face found in the photo. Use a clear front-facing portrait." },
+  "errMultiFace": {
+    "message": "Multiple faces found in the photo ($COUNT$). Upload a photo with only your own face.",
+    "placeholders": { "count": { "content": "$1" } }
+  },
+  "errFaceTooSmall": { "message": "The face in the photo is too small. Use a closer portrait." },
+  "errProcessFailed": {
+    "message": "Couldn't process the photo: $MESSAGE$",
+    "placeholders": { "message": { "content": "$1" } }
+  },
+  "errNeedPhotoFirst": { "message": "Upload your photo first." },
+  "photoMeta": {
+    "message": "$WIDTH$×$HEIGHT$ · saved $DATE$",
+    "placeholders": {
+      "width": { "content": "$1" },
+      "height": { "content": "$2" },
+      "date": { "content": "$3" }
+    }
+  },
+  "statusPipelineError": { "message": "Couldn't process this page. Try reloading it." },
+  "statusNoPhoto": { "message": "Upload your photo — the swap won't work without it." },
+  "statusProcessing": { "message": "Processing…" },
+  "statusApplied": {
+    "message": "Faces replaced on this page: $COUNT$",
+    "placeholders": { "count": { "content": "$1" } }
+  },
+  "statusNoneFound": { "message": "No faces to replace found yet" },
+  "badgeShowOriginal": { "message": "original" },
+  "badgeRestoreFace": { "message": "restore face" }
+}

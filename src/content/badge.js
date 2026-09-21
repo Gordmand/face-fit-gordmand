@@ -101,7 +101,7 @@ function scheduleHide() {
 }
 
 function setLabel(shown) {
-  btn.textContent = shown === "orig" ? "вернуть лицо" : "оригинал";
+  btn.textContent = chrome.i18n.getMessage(shown === "orig" ? "badgeRestoreFace" : "badgeShowOriginal");
 }
 
 function reposition() {
