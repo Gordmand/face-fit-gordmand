@@ -82,10 +82,20 @@ function loadPipeline() {
           getSourceEmbedding(),
         ]);
 
-        const blob = await fetchImage(imageUrl, fallbackUrl);
-        const bmp = await createImageBitmap(blob, { imageOrientation: "from-image" });
-        const imgW = bmp.width; // фиксируем до bmp.close() — после закрытия обнуляются
-        const imgH = bmp.height;
+        // Сбой на этом шаге (сеть, битый файл, ошибка декодирования) — беда одной конкретной
+        // картинки, а не всего конвейера: не должен останавливать обработку остальных.
+        let blob, bmp, imgW, imgH;
+        const tFetch0 = performance.now();
+        try {
+          blob = await fetchImage(imageUrl, fallbackUrl);
+          bmp = await createImageBitmap(blob, { imageOrientation: "from-image" });
+          imgW = bmp.width; // фиксируем до bmp.close() — после закрытия обнуляются
+          imgH = bmp.height;
+        } catch (err) {
+          console.warn("[face-fit/offscreen] не удалось загрузить/декодировать картинку:", err.message);
+          return { ok: false, reason: "fetch-failed" };
+        }
+        const fetchMs = Math.round(performance.now() - tFetch0); // сеть отдельно от инференса — для диагностики
 
         const lm = detectFace(landmarker, bmp);
         if (!lm) {
@@ -130,6 +140,7 @@ function loadPipeline() {
           height: out.height,
           faceW,
           faceH,
+          fetchMs,
           ms: Math.round(performance.now() - t0),
         };
       }

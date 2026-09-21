@@ -197,8 +197,14 @@ async function process(img, origUrl) {
         noPhoto = true;
         console.info("[face-fit] загрузите своё фото в popup — замена не работает без него");
       }
-    } else if (res?.reason === "no-face" || res?.reason === "gender-mismatch") {
-      cache.set(key, null); // лица нет или не подходит пол — повторно не дёргаем
+    } else if (
+      res?.reason === "no-face" ||
+      res?.reason === "gender-mismatch" ||
+      res?.reason === "fetch-failed"
+    ) {
+      // Проблема одной конкретной картинки (лица нет / не тот пол / не скачалась или
+      // не декодировалась) — остальные это не касается, повторно эту не дёргаем.
+      cache.set(key, null);
       clearSwap(img); // если картинка уже показывала старый своп (до смены настроек) — снять его
     } else {
       // Неопознанная причина — офscreen-конвейер сломан (не загрузилась модель и т.п.).
