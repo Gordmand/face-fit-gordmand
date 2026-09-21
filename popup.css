@@ -196,23 +196,6 @@ h1 {
   to { transform: rotate(360deg); }
 }
 
-.link-btn {
-  margin-top: 14px;
-  width: 100%;
-  font: inherit;
-  font-size: 12px;
-  padding: 7px;
-  border: 1px solid #e4e4e7;
-  border-radius: 6px;
-  background: #fafafa;
-  color: #555;
-  cursor: pointer;
-}
-
-.link-btn:hover {
-  background: #f0f0f0;
-}
-
 /* Тумблер */
 .switch {
   position: relative;

@@ -58,10 +58,13 @@ async function ortWasm() {
   const dir = p("node_modules/onnxruntime-web/dist");
   if (!(await exists(dir))) throw new Error(`Не найден ${dir}. Сначала: npm install`);
   await mkdir(p("public/ort"), { recursive: true });
-  // Все варианты рантайма ort-wasm-simd-threaded.* (base / jsep / jspi / asyncify).
-  // Разные бэкенды подтягивают разные — на этапе 7 оставим только нужные.
+  // node_modules содержит 4 варианта рантайма (base/jsep/jspi/asyncify), но наш импорт
+  // "onnxruntime-web/webgpu" резолвится в ort.webgpu.bundle.min.mjs, а он (проверено
+  // прямо в его исходнике) во всех случаях грузит только .asyncify.{wasm,mjs} — GPU- и
+  // wasm-бэкенды в этой сборке уже объединены в одном wasm-модуле. Остальные варианты
+  // (~58 МБ) этот бандл никогда не запрашивает — не копируем.
   const files = (await readdir(dir)).filter(
-    (f) => /^ort-wasm-simd-threaded(\.\w+)?\.(wasm|mjs)$/.test(f),
+    (f) => /^ort-wasm-simd-threaded\.asyncify\.(wasm|mjs)$/.test(f),
   );
   for (const f of files) {
     await copyFile(resolve(dir, f), p("public/ort", f));

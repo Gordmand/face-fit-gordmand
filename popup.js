@@ -201,18 +201,6 @@ removeBtn.addEventListener("click", async () => {
   await renderSaved();
 });
 
-el("open-test").addEventListener("click", () => {
-  chrome.tabs.create({ url: chrome.runtime.getURL("src/test/landmarker.html") });
-});
-
-el("open-swap-test").addEventListener("click", () => {
-  chrome.tabs.create({ url: chrome.runtime.getURL("src/test/swap.html") });
-});
-
-el("open-offscreen-test").addEventListener("click", () => {
-  chrome.tabs.create({ url: chrome.runtime.getURL("src/test/offscreen-test.html") });
-});
-
 // --- Статус активной вкладки (счётчик замен / индикатор обработки) ---
 
 const pageStatus = el("page-status");
