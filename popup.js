@@ -206,10 +206,16 @@ const pageStatus = el("page-status");
 function setPageStatus(s) {
   if (!s || !s.enabled) {
     pageStatus.hidden = true;
+    pageStatus.classList.remove("warn");
     return;
   }
   pageStatus.hidden = false;
-  if (s.pending > 0) {
+  pageStatus.classList.toggle("warn", !!s.pipelineError);
+  if (s.pipelineError) {
+    pageStatus.textContent = "Не удалось обработать страницу. Попробуйте её перезагрузить.";
+  } else if (s.noPhoto) {
+    pageStatus.textContent = "Загрузите своё фото — без него замена не работает.";
+  } else if (s.pending > 0) {
     pageStatus.innerHTML = `<span class="spinner"></span> Обрабатываю…`;
   } else if (s.applied > 0) {
     pageStatus.textContent = `Заменено лиц на странице: ${s.applied}`;

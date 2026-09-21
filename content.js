@@ -2,7 +2,12 @@
 // отдаёт их URL в offscreen-конвейер, подменяет результат.
 // Тяжёлого тут нет — только DOM и chrome.runtime.
 
-import { isImageCandidate, SerialQueue, upgradeLmcdnUrl } from "./src/content/scanner.js";
+import {
+  isImageCandidate,
+  SerialQueue,
+  upgradeLmcdnUrl,
+  isNearViewport,
+} from "./src/content/scanner.js";
 import { initBadge, hideBadge } from "./src/content/badge.js";
 
 const MARK = "facefitDone"; // img.dataset.facefitDone === "1" — уже подменено
@@ -17,7 +22,8 @@ let userGender = null;
 let started = false;
 let io = null;
 let mo = null;
-let noPhotoLogged = false;
+let noPhoto = false; // хоть раз пришло "фото пользователя не задано"
+let pipelineError = null; // офscreen сломался (не no-face/gender-mismatch/no-photo) — не пробуем дальше
 let inFlight = 0; // сколько картинок сейчас в очереди/обработке — для индикатора в popup
 
 async function main() {
@@ -57,6 +63,8 @@ async function main() {
 function start() {
   if (started) return;
   started = true;
+  noPhoto = false;
+  pipelineError = null;
   console.info("[face-fit] сканер запущен на", location.host);
   console.info("[face-fit] настройки:", { foreheadMask, matchGender, userGender });
 
@@ -116,6 +124,14 @@ function originalUrl(img) {
   return img.dataset.facefitOrig || img.currentSrc || img.src;
 }
 
+const VIEWPORT_MARGIN_SCREENS = 2; // запас в экранах — картинка дальше этого считается неактуальной
+
+/** Не укатилась ли картинка далеко за пределы экрана, пока ждала очереди. */
+function stillRelevant(img) {
+  const vh = window.innerHeight;
+  return isNearViewport(img.getBoundingClientRect(), vh, vh * VIEWPORT_MARGIN_SCREENS);
+}
+
 function consider(img) {
   if (!enabled || seen.has(img) || img.dataset[MARK]) return;
 
@@ -137,7 +153,7 @@ function consider(img) {
 // --- обработка ---
 
 async function process(img, origUrl) {
-  if (!enabled || !img.isConnected) return;
+  if (!enabled || !img.isConnected || pipelineError) return;
 
   const key = upgradeLmcdnUrl(origUrl);
 
@@ -145,6 +161,15 @@ async function process(img, origUrl) {
     const cached = cache.get(key);
     if (cached) applyResult(img, origUrl, key, cached);
     return; // null -> лица нет, повторно не дёргаем
+  }
+
+  if (!stillRelevant(img)) {
+    // Пока ждала очереди, картинку укатило далеко от экрана — не тратим на неё
+    // дорогой инференс. Вернём в наблюдение: если пользователь проскроллит назад,
+    // обработаем заново.
+    seen.delete(img);
+    io?.observe(img);
+    return;
   }
 
   let res;
@@ -163,12 +188,19 @@ async function process(img, origUrl) {
   }
 
   if (!res?.ok) {
-    if (res?.reason === "фото пользователя не задано" && !noPhotoLogged) {
-      noPhotoLogged = true;
-      console.info("[face-fit] загрузите своё фото в popup — замена не работает без него");
+    if (res?.reason === "фото пользователя не задано") {
+      if (!noPhoto) {
+        noPhoto = true;
+        console.info("[face-fit] загрузите своё фото в popup — замена не работает без него");
+      }
     } else if (res?.reason === "no-face" || res?.reason === "gender-mismatch") {
       cache.set(key, null); // лица нет или не подходит пол — повторно не дёргаем
       clearSwap(img); // если картинка уже показывала старый своп (до смены настроек) — снять его
+    } else {
+      // Неопознанная причина — офscreen-конвейер сломан (не загрузилась модель и т.п.).
+      // Дальше пытаться бессмысленно, пока страницу не перезагрузят.
+      pipelineError = res?.reason || "неизвестная ошибка";
+      console.error("[face-fit] конвейер сломан:", pipelineError);
     }
     return;
   }
@@ -289,6 +321,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     applied: document.querySelectorAll(`img[data-facefit-done]`).length,
     pending: inFlight,
     enabled,
+    noPhoto,
+    pipelineError,
   });
 });
 

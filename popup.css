@@ -60,6 +60,11 @@ h1 {
   margin: 0;
 }
 
+.page-status.warn {
+  background: #fdf3f3;
+  color: #b91c1c;
+}
+
 #settings {
   margin-top: 14px;
   padding-top: 12px;

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { isImageCandidate, SerialQueue, upgradeLmcdnUrl } from "./scanner.js";
+import { isImageCandidate, SerialQueue, upgradeLmcdnUrl, isNearViewport } from "./scanner.js";
 
 describe("isImageCandidate", () => {
   const ok = { width: 300, height: 400, src: "https://a.lmcdn.ru/img600x866/x.jpg" };
@@ -56,6 +56,33 @@ describe("upgradeLmcdnUrl", () => {
     expect(upgradeLmcdnUrl("https://a.lmcdn.ru/product/x.jpg")).toBe(
       "https://a.lmcdn.ru/product/x.jpg",
     );
+  });
+});
+
+describe("isNearViewport", () => {
+  const viewportHeight = 800;
+  const margin = 1600; // 2 экрана
+
+  it("картинка внутри вьюпорта — рядом", () => {
+    expect(isNearViewport({ top: 100, bottom: 500 }, viewportHeight, margin)).toBe(true);
+  });
+
+  it("картинка чуть выше или ниже экрана — всё ещё рядом", () => {
+    expect(isNearViewport({ top: -900, bottom: -700 }, viewportHeight, margin)).toBe(true);
+    expect(isNearViewport({ top: 1700, bottom: 1900 }, viewportHeight, margin)).toBe(true);
+  });
+
+  it("картинка укатилась на несколько экранов вверх — не рядом", () => {
+    expect(isNearViewport({ top: -3000, bottom: -2800 }, viewportHeight, margin)).toBe(false);
+  });
+
+  it("картинка далеко ниже (ещё не проскроллили) — не рядом", () => {
+    expect(isNearViewport({ top: 3000, bottom: 3200 }, viewportHeight, margin)).toBe(false);
+  });
+
+  it("граница — ровно на краю запаса всё ещё считается рядом", () => {
+    expect(isNearViewport({ top: -1600, bottom: -1600 }, viewportHeight, margin)).toBe(true);
+    expect(isNearViewport({ top: 2400, bottom: 2400 }, viewportHeight, margin)).toBe(true);
   });
 });
 

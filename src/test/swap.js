@@ -47,11 +47,11 @@ async function detectSource(file) {
   return { bitmap, landmarks: faces[0] };
 }
 
-// Цель — как в проде: с запасным проходом по верху кадра (фото в полный рост).
+// Цель — как в проде: с запасными проходами по частям кадра (полный рост / сидя).
 async function detectTarget(file) {
   const landmarker = await getLandmarker();
   const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
-  const lm = detectFace(landmarker, bitmap, { topFraction: 0.5 });
+  const lm = detectFace(landmarker, bitmap);
   if (!lm) {
     bitmap.close?.();
     throw new Error("лицо не найдено");

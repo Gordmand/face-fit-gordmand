@@ -34,6 +34,17 @@ export function upgradeLmcdnUrl(url) {
   );
 }
 
+/**
+ * Ещё стоит ли тратить дорогой инференс на эту картинку — не укатилась ли она
+ * далеко за пределы экрана, пока ждала своей очереди.
+ * @param {{ top:number, bottom:number }} rect прямоугольник картинки (как getBoundingClientRect)
+ * @param {number} viewportHeight
+ * @param {number} margin запас в пикселях сверху/снизу вьюпорта
+ */
+export function isNearViewport({ top, bottom }, viewportHeight, margin) {
+  return bottom >= -margin && top <= viewportHeight + margin;
+}
+
 /** Очередь async-задач: одна в моменте, в порядке добавления, ошибки не роняют. */
 export class SerialQueue {
   #tail = Promise.resolve();

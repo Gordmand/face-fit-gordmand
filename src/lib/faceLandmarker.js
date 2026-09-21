@@ -120,31 +120,44 @@ export function remapCropLandmarks(faceLandmarks, { xScale = 1, xOffset = 0, ySc
   }));
 }
 
+// Полосы кадра, пробуемые по очереди, когда детекция по всему кадру не нашла лицо.
+// Верх — типовые full-body карточки (голова у верхнего края). Средняя полоса —
+// сидящие модели / кроп по пояс, где голова заметно ниже верхних 50%.
+const DEFAULT_FALLBACKS = [
+  { yStart: 0, yEnd: 0.5 },
+  { yStart: 0.25, yEnd: 0.75 },
+];
+
 /**
- * Детекция одного лица с запасным проходом по верхней части кадра.
+ * Детекция одного лица с запасными проходами по частям кадра.
  * MediaPipe FaceLandmarker не находит лица, занимающие малую долю кадра
- * (фото в полный рост на карточках) — тогда детектим по верхнему кропу
+ * (фото в полный рост на карточках) — тогда детектим по кропу нужной полосы
  * и пересчитываем точки обратно в полный кадр.
  * @param {import("@mediapipe/tasks-vision").FaceLandmarker} landmarker
  * @param {CanvasImageSource & { width:number, height:number }} image
- * @param {{ topFraction?: number }} [opts]
+ * @param {{ fallbacks?: Array<{yStart:number,yEnd:number}> }} [opts]
  * @returns {Array|null} нормализованные landmarks в координатах ПОЛНОГО кадра, либо null
  */
-export function detectFace(landmarker, image, { topFraction = 0.5 } = {}) {
+export function detectFace(landmarker, image, { fallbacks = DEFAULT_FALLBACKS } = {}) {
   const first = landmarker.detect(image).faceLandmarks ?? [];
   if (first.length > 0) return first[0];
 
-  const cropH = Math.max(1, Math.round(image.height * topFraction));
-  const canvas = document.createElement("canvas");
-  canvas.width = image.width;
-  canvas.height = cropH;
-  canvas
-    .getContext("2d")
-    .drawImage(image, 0, 0, image.width, cropH, 0, 0, image.width, cropH);
+  for (const { yStart, yEnd } of fallbacks) {
+    const y0 = Math.round(image.height * yStart);
+    const cropH = Math.max(1, Math.round(image.height * yEnd) - y0);
+    const canvas = document.createElement("canvas");
+    canvas.width = image.width;
+    canvas.height = cropH;
+    canvas
+      .getContext("2d")
+      .drawImage(image, 0, y0, image.width, cropH, 0, 0, image.width, cropH);
 
-  const second = landmarker.detect(canvas).faceLandmarks ?? [];
-  if (second.length === 0) return null;
-  return remapCropLandmarks(second[0], { yScale: cropH / image.height });
+    const found = landmarker.detect(canvas).faceLandmarks ?? [];
+    if (found.length > 0) {
+      return remapCropLandmarks(found[0], { yScale: cropH / image.height, yOffset: yStart });
+    }
+  }
+  return null;
 }
 
 /** Прямоугольник вокруг всех точек лица в нормализованных координатах 0..1. */

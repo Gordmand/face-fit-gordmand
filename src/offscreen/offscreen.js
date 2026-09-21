@@ -87,7 +87,7 @@ function loadPipeline() {
         const imgW = bmp.width; // фиксируем до bmp.close() — после закрытия обнуляются
         const imgH = bmp.height;
 
-        const lm = detectFace(landmarker, bmp, { topFraction: 0.5 });
+        const lm = detectFace(landmarker, bmp);
         if (!lm) {
           bmp.close?.();
           return { ok: false, reason: "no-face", imgW, imgH };
