@@ -3,7 +3,7 @@
 //   1. WASM-рантайм MediaPipe        node_modules -> public/wasm/
 //   2. Модель face_landmarker.task   скачивание   -> public/models/
 //   3. WASM-рантайм ONNX Runtime     node_modules -> public/ort/
-//   4. Модели ONNX (ArcFace, inswapper) скачивание -> public/models/
+//   4. Модели ONNX (ArcFace, inswapper, genderage) скачивание -> public/models/
 //   5. Матрица emap из inswapper     извлечение   -> public/models/inswapper_emap.bin
 //
 // Большие .onnx (сотни МБ) не коммитятся в git — только генерируются этим скриптом.
@@ -85,6 +85,11 @@ const MODELS = {
     url: "https://huggingface.co/hacksider/deep-live-cam/resolve/main/inswapper_128_fp16.onnx",
     dest: p("public/models/inswapper_128_fp16.onnx"),
     label: "модель inswapper (fp16, ~265 МБ)",
+  },
+  genderage: {
+    url: "https://huggingface.co/public-data/insightface/resolve/main/models/buffalo_l/genderage.onnx",
+    dest: p("public/models/genderage.onnx"),
+    label: "модель genderage (пол/возраст, ~1.3 МБ)",
   },
 };
 

@@ -12,6 +12,8 @@ const cache = new Map(); // key (upgraded URL) -> dataUrl | null (null = лиц�
 
 let enabled = false;
 let foreheadMask = true;
+let matchGender = true;
+let userGender = null;
 let started = false;
 let io = null;
 let mo = null;
@@ -19,9 +21,11 @@ let noPhotoLogged = false;
 let inFlight = 0; // сколько картинок сейчас в очереди/обработке — для индикатора в popup
 
 async function main() {
-  ({ enabled, foreheadMask } = await chrome.storage.local.get({
+  ({ enabled, foreheadMask, matchGender, userGender } = await chrome.storage.local.get({
     enabled: false,
     foreheadMask: true,
+    matchGender: true,
+    userGender: null,
   }));
 
   chrome.storage.onChanged.addListener((changes, area) => {
@@ -35,6 +39,16 @@ async function main() {
       foreheadMask = changes.foreheadMask.newValue;
       if (started) reprocessAll();
     }
+    if (changes.matchGender) {
+      matchGender = changes.matchGender.newValue;
+      console.info("[face-fit] настройки:", { foreheadMask, matchGender, userGender });
+      if (started) reprocessAll();
+    }
+    if (changes.userGender) {
+      userGender = changes.userGender.newValue;
+      console.info("[face-fit] настройки:", { foreheadMask, matchGender, userGender });
+      if (started) reprocessAll();
+    }
   });
 
   if (enabled) start();
@@ -44,6 +58,7 @@ function start() {
   if (started) return;
   started = true;
   console.info("[face-fit] сканер запущен на", location.host);
+  console.info("[face-fit] настройки:", { foreheadMask, matchGender, userGender });
 
   initBadge(toggleImage);
   io = new IntersectionObserver(onIntersect, { rootMargin: "200px" });
@@ -139,6 +154,8 @@ async function process(img, origUrl) {
       imageUrl: key,
       fallbackUrl: origUrl,
       foreheadMask,
+      matchGender,
+      userGender,
     });
   } catch (err) {
     console.warn("[face-fit] запрос свопа не прошёл:", err.message);
@@ -149,8 +166,9 @@ async function process(img, origUrl) {
     if (res?.reason === "фото пользователя не задано" && !noPhotoLogged) {
       noPhotoLogged = true;
       console.info("[face-fit] загрузите своё фото в popup — замена не работает без него");
-    } else if (res?.reason === "no-face") {
-      cache.set(key, null); // лица нет — повторно не дёргаем
+    } else if (res?.reason === "no-face" || res?.reason === "gender-mismatch") {
+      cache.set(key, null); // лица нет или не подходит пол — повторно не дёргаем
+      clearSwap(img); // если картинка уже показывала старый своп (до смены настроек) — снять его
     }
     return;
   }
@@ -171,6 +189,19 @@ function applyResult(img, origUrl, key, dataUrl) {
     img.removeAttribute("srcset");
     img.src = dataUrl;
   });
+}
+
+/** Убрать уже показанный своп с картинки, не трогая её отметку «просмотрено». */
+function clearSwap(img) {
+  if (!img.dataset.facefitOrig) return; // свопа и не было — нечего снимать
+  img.src = img.dataset.facefitOrig;
+  const srcset = img.dataset.facefitSrcset;
+  if (srcset) img.setAttribute("srcset", srcset);
+  else img.removeAttribute("srcset");
+  delete img.dataset.facefitOrig;
+  delete img.dataset.facefitSrcset;
+  delete img.dataset.facefitKey;
+  delete img.dataset.facefitShown;
 }
 
 function revert(img) {

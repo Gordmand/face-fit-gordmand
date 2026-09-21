@@ -124,14 +124,26 @@ async function renderSaved() {
 // --- Тумблеры ---
 
 const foreheadToggle = el("forehead-toggle");
+const matchGenderToggle = el("match-gender-toggle");
+const genderButtons = document.querySelectorAll("#gender-segmented .segmented-btn");
+
+function setGenderButtons(gender) {
+  for (const btn of genderButtons) {
+    btn.setAttribute("aria-pressed", String(btn.dataset.gender === gender));
+  }
+}
 
 async function initToggles() {
-  const { enabled, foreheadMask } = await chrome.storage.local.get({
+  const { enabled, foreheadMask, matchGender, userGender } = await chrome.storage.local.get({
     enabled: false,
     foreheadMask: true,
+    matchGender: true,
+    userGender: null,
   });
   toggle.checked = enabled;
   foreheadToggle.checked = foreheadMask;
+  matchGenderToggle.checked = matchGender;
+  setGenderButtons(userGender);
 }
 
 toggle.addEventListener("change", async () => {
@@ -147,6 +159,17 @@ toggle.addEventListener("change", async () => {
 foreheadToggle.addEventListener("change", async () => {
   await chrome.storage.local.set({ foreheadMask: foreheadToggle.checked });
 });
+
+matchGenderToggle.addEventListener("change", async () => {
+  await chrome.storage.local.set({ matchGender: matchGenderToggle.checked });
+});
+
+for (const btn of genderButtons) {
+  btn.addEventListener("click", async () => {
+    setGenderButtons(btn.dataset.gender);
+    await chrome.storage.local.set({ userGender: btn.dataset.gender });
+  });
+}
 
 // --- События ---
 

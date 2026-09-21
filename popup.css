@@ -75,6 +75,32 @@ h1 {
   margin-bottom: 4px;
 }
 
+.segmented {
+  display: inline-flex;
+  border: 1px solid #d4d4d8;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.segmented-btn {
+  font: inherit;
+  font-size: 12px;
+  padding: 4px 12px;
+  border: 0;
+  background: #f6f6f7;
+  color: #1a1a1a;
+  cursor: pointer;
+}
+
+.segmented-btn + .segmented-btn {
+  border-left: 1px solid #d4d4d8;
+}
+
+.segmented-btn[aria-pressed="true"] {
+  background: #2563eb;
+  color: #fff;
+}
+
 /* Кнопки */
 .btn {
   display: inline-flex;

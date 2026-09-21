@@ -62,6 +62,22 @@
         </span>
       </label>
       <p class="hint">Поднимает край замены в линию волос — стык менее заметен.</p>
+
+      <label class="setting-row">
+        <span>Только модели своего пола</span>
+        <span class="switch">
+          <input type="checkbox" id="match-gender-toggle" />
+          <span class="slider"></span>
+        </span>
+      </label>
+      <div class="setting-row">
+        <span>Мой пол</span>
+        <span class="segmented" id="gender-segmented">
+          <button type="button" class="segmented-btn" data-gender="female">Ж</button>
+          <button type="button" class="segmented-btn" data-gender="male">М</button>
+        </span>
+      </div>
+      <p class="hint">Выключите, чтобы примерять образы любого пола.</p>
     </section>
 
     <button id="open-test" class="link-btn" type="button">🔬 Тест детекции лица</button>

@@ -16,6 +16,7 @@ function loadPipeline() {
         { swapFace },
         { faceOvalPolygon, featherMask, colorMatch, pasteBack },
         { getUserPhotoBlob },
+        { classifyGender },
       ] = await Promise.all([
         import("../lib/faceLandmarker.js"),
         import("../lib/align.js"),
@@ -23,6 +24,7 @@ function loadPipeline() {
         import("../lib/inswapper.js"),
         import("../lib/blend.js"),
         import("../lib/storage.js"),
+        import("../lib/genderage.js"),
       ]);
 
       let landmarkerPromise = null;
@@ -68,7 +70,12 @@ function loadPipeline() {
         return resp.blob();
       }
 
-      async function processImage(imageUrl, { fallbackUrl, foreheadMask = true } = {}) {
+      const GENDER_CONF_MIN = 0.6; // ниже этого порога считаем классификацию ненадёжной и не блокируем своп
+
+      async function processImage(
+        imageUrl,
+        { fallbackUrl, foreheadMask = true, matchGender = false, userGender = null } = {},
+      ) {
         const t0 = performance.now();
         const [landmarker, sourceEmbedding] = await Promise.all([
           getLandmarker(),
@@ -89,6 +96,20 @@ function loadPipeline() {
         const bb = landmarksBBox(lm);
         const faceW = Math.round(bb.w * imgW);
         const faceH = Math.round(bb.h * imgH);
+
+        if (matchGender && userGender) {
+          const { gender, genderConf } = await classifyGender(bmp, {
+            x: bb.x * imgW,
+            y: bb.y * imgH,
+            w: bb.w * imgW,
+            h: bb.h * imgH,
+          });
+          if (genderConf >= GENDER_CONF_MIN && gender !== userGender) {
+            bmp.close?.();
+            return { ok: false, reason: "gender-mismatch", imgW, imgH };
+          }
+        }
+
         const kps = insightFaceKps(lm, imgW, imgH);
         const M = estimateNorm(kps, 128);
         const crop = warpToCanvas(bmp, M, 128, 128);
@@ -131,6 +152,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       processImage(msg.imageUrl, {
         fallbackUrl: msg.fallbackUrl,
         foreheadMask: msg.foreheadMask,
+        matchGender: msg.matchGender,
+        userGender: msg.userGender,
       }),
     )
     .then(sendResponse)

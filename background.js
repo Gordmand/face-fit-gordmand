@@ -63,6 +63,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         imageUrl: msg.imageUrl,
         fallbackUrl: msg.fallbackUrl,
         foreheadMask: msg.foreheadMask,
+        matchGender: msg.matchGender,
+        userGender: msg.userGender,
       });
       sendResponse(res);
     })().catch((err) => {
