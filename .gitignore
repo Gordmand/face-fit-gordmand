@@ -10,3 +10,6 @@ Thumbs.db
 public/wasm/
 public/ort/
 public/models/
+
+# Готовые архивы для GitHub Release — не коммитим в git, только как Release asset
+*.zip
