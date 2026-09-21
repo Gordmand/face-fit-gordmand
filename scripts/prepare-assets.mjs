@@ -29,19 +29,38 @@ async function exists(path) {
 
 const mb = (n) => (n / 1e6).toFixed(1) + " МБ";
 
-async function download(url, dest, label) {
+async function download(url, dest, label, tries = 3) {
   await mkdir(dirname(dest), { recursive: true });
   if (await exists(dest)) {
     const { size } = await stat(dest);
     console.log(`✓ ${label}: уже на месте (${mb(size)}), пропускаю`);
     return;
   }
-  console.log(`… качаю ${label}: ${url}`);
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status} при скачивании ${label}`);
-  await pipeline(Readable.fromWeb(res.body), createWriteStream(dest));
-  const { size } = await stat(dest);
-  console.log(`✓ ${label} → ${dest.replace(root + "\\", "").replace(/\\/g, "/")} (${mb(size)})`);
+  // fetch() сам может упасть (обрыв, таймаут соединения) ещё до получения ответа —
+  // это не HTTP-ошибка, а сетевое исключение; без try/catch оно крашит весь скрипт
+  // необработанным исключением, не давая дойти до verifyAssets() в конце.
+  for (let attempt = 1; attempt <= tries; attempt++) {
+    console.log(`… качаю ${label} (попытка ${attempt}/${tries}): ${url}`);
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      await pipeline(Readable.fromWeb(res.body), createWriteStream(dest));
+      const { size } = await stat(dest);
+      console.log(`✓ ${label} → ${dest.replace(root + "\\", "").replace(/\\/g, "/")} (${mb(size)})`);
+      return;
+    } catch (err) {
+      console.log(`  не получилось: ${err.cause?.message || err.message}`);
+      if (attempt === tries) {
+        const host = new URL(url).host;
+        throw new Error(
+          `Не удалось скачать ${label} с ${host} после ${tries} попыток. ` +
+            `Проверьте интернет-соединение; если сайт ${host} недоступен из вашей сети, ` +
+            `попробуйте через VPN и запустите npm run setup ещё раз.`,
+        );
+      }
+      await new Promise((r) => setTimeout(r, 3000));
+    }
+  }
 }
 
 // --- 1. MediaPipe wasm ---
