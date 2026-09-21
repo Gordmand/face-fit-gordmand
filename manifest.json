@@ -8,7 +8,12 @@
     "default_title": "Face Fit"
   },
   "permissions": ["storage", "activeTab", "offscreen"],
-  "host_permissions": ["https://*.lamoda.ru/*", "https://*.lmcdn.ru/*"],
+  "host_permissions": [
+    "https://*.lamoda.ru/*",
+    "https://*.lmcdn.ru/*",
+    "https://*.wildberries.ru/*",
+    "https://*.wbbasket.ru/*"
+  ],
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
   },
@@ -17,7 +22,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://*.lamoda.ru/*"],
+      "matches": ["https://*.lamoda.ru/*", "https://*.wildberries.ru/*"],
       "js": ["content.js"],
       "run_at": "document_idle"
     }

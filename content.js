@@ -1,4 +1,4 @@
-// Content script (только Lamoda): сканирует страницу, находит фото моделей,
+// Content script (Lamoda, Wildberries): сканирует страницу, находит фото моделей,
 // отдаёт их URL в offscreen-конвейер, подменяет результат.
 // Тяжёлого тут нет — только DOM и chrome.runtime.
 
@@ -12,7 +12,7 @@ import { initBadge, hideBadge } from "./src/content/badge.js";
 
 const MARK = "facefitDone"; // img.dataset.facefitDone === "1" — уже подменено
 const queue = new SerialQueue();
-const seen = new WeakSet(); // картинки, уже поставленные в очередь
+let seen = new WeakSet(); // картинки, уже поставленные в очередь
 const cache = new Map(); // key (upgraded URL) -> dataUrl | null (null = лица нет)
 
 let enabled = false;
@@ -89,6 +89,10 @@ function stop() {
   hideBadge();
   for (const img of document.querySelectorAll(`img[data-facefit-done]`)) revert(img);
   cache.clear();
+  // Картинки, что были в очереди/обработке, но не успели дойти до готового свопа,
+  // revert() не касается — без сброса они бы навсегда остались «уже рассмотрено»
+  // и не переоценились после повторного включения.
+  seen = new WeakSet();
 }
 
 /** Сброс всех замен и повторная обработка — при смене настройки «маска в лоб». */
@@ -124,7 +128,7 @@ function originalUrl(img) {
   return img.dataset.facefitOrig || img.currentSrc || img.src;
 }
 
-const VIEWPORT_MARGIN_SCREENS = 2; // запас в экранах — картинка дальше этого считается неактуальной
+const VIEWPORT_MARGIN_SCREENS = 1; // запас в экранах — картинка дальше этого считается неактуальной
 
 /** Не укатилась ли картинка далеко за пределы экрана, пока ждала очереди. */
 function stillRelevant(img) {
