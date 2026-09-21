@@ -65,6 +65,75 @@ h1 {
   color: #b91c1c;
 }
 
+/* Онбординг */
+#onboarding {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  background: #f6f6f7;
+  border-radius: 10px;
+}
+
+.onboarding-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.onboarding-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  padding: 3px 0;
+}
+
+.onboarding-num {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #e4e4e7;
+  color: #666;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.onboarding-num.done {
+  background: #2563eb;
+  color: #fff;
+}
+
+#marketplace-links {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+}
+
+.site-links {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.site-link {
+  font: inherit;
+  font-size: 11px;
+  padding: 4px 9px;
+  border: 1px solid #d4d4d8;
+  border-radius: 999px;
+  background: #fff;
+  color: #1a1a1a;
+  cursor: pointer;
+}
+
+.site-link:hover {
+  background: #ececed;
+}
+
 #settings {
   margin-top: 14px;
   padding-top: 12px;

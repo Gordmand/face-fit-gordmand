@@ -45,5 +45,10 @@
   },
   "statusNoneFound": { "message": "Лиц для замены пока не найдено" },
   "badgeShowOriginal": { "message": "оригинал" },
-  "badgeRestoreFace": { "message": "вернуть лицо" }
+  "badgeRestoreFace": { "message": "вернуть лицо" },
+  "onboardingTitle": { "message": "Как начать" },
+  "onboardingStepPhoto": { "message": "Загрузите своё фото" },
+  "onboardingStepSite": { "message": "Откройте один из маркетплейсов (ссылки ниже)" },
+  "onboardingStepEnable": { "message": "Включите переключатель вверху" },
+  "marketplaceLinksLabel": { "message": "Открыть маркетплейс" }
 }

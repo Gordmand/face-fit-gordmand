@@ -45,5 +45,10 @@
   },
   "statusNoneFound": { "message": "No faces to replace found yet" },
   "badgeShowOriginal": { "message": "original" },
-  "badgeRestoreFace": { "message": "restore face" }
+  "badgeRestoreFace": { "message": "restore face" },
+  "onboardingTitle": { "message": "Getting started" },
+  "onboardingStepPhoto": { "message": "Upload your photo" },
+  "onboardingStepSite": { "message": "Open one of the marketplaces (links below)" },
+  "onboardingStepEnable": { "message": "Turn on the toggle above" },
+  "marketplaceLinksLabel": { "message": "Open a marketplace" }
 }

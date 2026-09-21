@@ -16,6 +16,22 @@
   </header>
 
   <main>
+    <section id="onboarding" hidden>
+      <p class="onboarding-title" data-i18n="onboardingTitle">Как начать</p>
+      <div class="onboarding-step" id="onb-photo">
+        <span class="onboarding-num" data-n="1">1</span>
+        <span data-i18n="onboardingStepPhoto">Загрузите своё фото</span>
+      </div>
+      <div class="onboarding-step">
+        <span class="onboarding-num" data-n="2">2</span>
+        <span data-i18n="onboardingStepSite">Откройте один из маркетплейсов (ссылки ниже)</span>
+      </div>
+      <div class="onboarding-step" id="onb-enable">
+        <span class="onboarding-num" data-n="3">3</span>
+        <span data-i18n="onboardingStepEnable">Включите переключатель вверху</span>
+      </div>
+    </section>
+
     <p id="page-status" class="page-status" hidden></p>
 
     <section id="photo">
@@ -78,6 +94,15 @@
         </span>
       </div>
       <p class="hint" data-i18n="matchGenderHint">Выключите, чтобы примерять образы любого пола.</p>
+    </section>
+
+    <section id="marketplace-links">
+      <p class="hint" data-i18n="marketplaceLinksLabel">Открыть маркетплейс</p>
+      <div class="site-links">
+        <button type="button" class="site-link" data-site="https://www.lamoda.ru">Lamoda</button>
+        <button type="button" class="site-link" data-site="https://www.wildberries.ru">Wildberries</button>
+        <button type="button" class="site-link" data-site="https://www.ozon.ru">Ozon</button>
+      </div>
     </section>
   </main>
 

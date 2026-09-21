@@ -123,6 +123,7 @@ async function renderSaved() {
   if (!blob || !meta) {
     hasPhoto = false;
     showState("empty");
+    await renderOnboarding();
     return;
   }
   hasPhoto = true;
@@ -133,7 +134,42 @@ async function renderSaved() {
   const when = new Date(meta.savedAt).toLocaleDateString(chrome.i18n.getUILanguage());
   metaText.textContent = t("photoMeta", [String(meta.width), String(meta.height), when]);
   showState("saved");
+  await renderOnboarding();
 }
+
+// --- Онбординг ---
+
+const onboarding = el("onboarding");
+const onbPhotoNum = document.querySelector("#onb-photo .onboarding-num");
+const onbEnableNum = document.querySelector("#onb-enable .onboarding-num");
+
+function setStepDone(numEl, done) {
+  numEl.textContent = done ? "✓" : numEl.dataset.n;
+  numEl.classList.toggle("done", done);
+}
+
+async function renderOnboarding() {
+  const { onboardingDone } = await chrome.storage.local.get({ onboardingDone: false });
+  if (onboardingDone) {
+    onboarding.hidden = true;
+    return;
+  }
+
+  setStepDone(onbPhotoNum, hasPhoto);
+  setStepDone(onbEnableNum, toggle.checked);
+  onboarding.hidden = false;
+
+  if (hasPhoto && toggle.checked) {
+    await chrome.storage.local.set({ onboardingDone: true });
+    onboarding.hidden = true;
+  }
+}
+
+document.querySelectorAll(".site-link").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    chrome.tabs.create({ url: btn.dataset.site });
+  });
+});
 
 // --- Тумблеры ---
 
@@ -168,6 +204,7 @@ toggle.addEventListener("change", async () => {
   }
   showError("");
   await chrome.storage.local.set({ enabled: toggle.checked });
+  await renderOnboarding();
 });
 
 foreheadToggle.addEventListener("change", async () => {
