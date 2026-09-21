@@ -19,11 +19,13 @@ const STYLE = `
     font: inherit; cursor: pointer;
     background: #111; color: #fff; border: 0; border-radius: 999px;
     padding: 4px 10px;
+    transition: background-color .25s ease, color .25s ease;
   }
-  .btn:hover { background: #000; }
+  .btn:hover { background: #064e3b; color: #fff; }
   @media (prefers-color-scheme: dark) {
     .pill { background: rgba(28,28,30,.92); color: #f5f5f7; border-color: rgba(255,255,255,.12); }
     .btn { background: #f5f5f7; color: #111; }
+    .btn:hover { background: #064e3b; color: #fff; }
   }
   [hidden] { display: none !important; }
 `;
