@@ -4,7 +4,8 @@ dist/
 .DS_Store
 Thumbs.db
 .vscode/
-.claude/settings.local.json
+# Локальные настройки/конфиги Claude Code — не относятся к самому расширению
+.claude/
 
 # Генерируется `npm run setup` — не коммитим (см. scripts/prepare-assets.mjs)
 public/wasm/
