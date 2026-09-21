@@ -1,4 +1,4 @@
-// Content script (Lamoda, Wildberries): сканирует страницу, находит фото моделей,
+// Content script (Lamoda, Wildberries, Ozon): сканирует страницу, находит фото моделей,
 // отдаёт их URL в offscreen-конвейер, подменяет результат.
 // Тяжёлого тут нет — только DOM и chrome.runtime.
 

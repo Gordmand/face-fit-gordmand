@@ -12,7 +12,10 @@
     "https://*.lamoda.ru/*",
     "https://*.lmcdn.ru/*",
     "https://*.wildberries.ru/*",
-    "https://*.wbbasket.ru/*"
+    "https://*.wbbasket.ru/*",
+    "https://*.ozon.ru/*",
+    "https://*.ozone.ru/*",
+    "https://*.ozonusercontent.com/*"
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
@@ -22,7 +25,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://*.lamoda.ru/*", "https://*.wildberries.ru/*"],
+      "matches": ["https://*.lamoda.ru/*", "https://*.wildberries.ru/*", "https://*.ozon.ru/*"],
       "js": ["content.js"],
       "run_at": "document_idle"
     }
